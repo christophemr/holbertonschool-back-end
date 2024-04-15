@@ -5,73 +5,35 @@ returns information about his/her TODO list progress
 import requests
 import sys
 
-
-def get_employee_todo_progress(employee_id):
-    # Base URL for the REST API
-    base_url = "https://jsonplaceholder.typicode.com"
-
-    # Construct the URL for fetching employee's TODO list
-    url = f"{base_url}/users/{employee_id}/todos"
-
-    try:
-        # Send GET request to fetch TODO list data
-        response = requests.get(url)
-
-        # Raise an exception for non-2xx status codes
-        response.raise_for_status()
-
-        # Convert response JSON to Python data
-        todo_data = response.json()
-        return todo_data
-    except requests.RequestException as e:
-        # Handle request errors
-        print("Error fetching data:", e)
-        return None
-
-
-def display_todo_progress(todo_data):
-    if not todo_data:
-        return
-
-    # Assuming employee name is the same as userID (first task's userId)
-    employee_name = todo_data[0]["userId"]
-
-    # Total number of tasks
-    total_tasks = len(todo_data)
-
-    # Number of completed tasks
-    completed_tasks = sum(task["completed"] for task in todo_data)
-
-    # Titles of completed tasks
-    completed_task_titles = [task["title"]
-                             for task in todo_data if task["completed"]]
-
-    # Display progress information
-    print(
-        f"Employee {employee_name} is done with tasks
-        ({completed_tasks}/{total_tasks}): "
-    )
-    for title in completed_task_titles:
-        # Print each completed task title with tabulation
-        print("\t", title)
-
-
-def main():
+if __name__ == "__main__":
     # Check if the correct number of arguments is provided
     if len(sys.argv) != 2:
-        print(f"Usage: python {__file__} employee_id(int)")
+        print(f"Usage: python3 {__file__} employee_id(int)")
         sys.exit(1)
 
-    # Extract employee ID from command-line argument
-    employee_id = sys.argv[1]
+    # Define constants and fetch employee ID from command-line argument
+    URL = "https://jsonplaceholder.typicode.com"
+    EMPLOYEE_ID = sys.argv[1]
 
-    # Fetch employee's TODO list progress
-    todo_data = get_employee_todo_progress(employee_id)
+    # Fetch TODO list data for the employee ID
+    RESPONSE = requests.get(
+        f"{URL}/users/{EMPLOYEE_ID}/todos", params={"_expand": "user"})
+    data = RESPONSE.json()
 
-    # Display progress information if data is fetched successfully
-    if todo_data:
-        display_todo_progress(todo_data)
+    # Check if data is empty
+    if not len(data):
+        print("RequestError:", 404)
+        sys.exit(1)
 
+    # Extract relevant information from the data
+    TASK_TITLE = [task["title"] for task in data if task["completed"]]
+    TOTAL_TASKS = len(data)
+    DONE_TASKS = len(TASK_TITLE)
+    EMPLOYEE_NAME = data[0]["user"]["name"]
 
-if __name__ == "__main__":
-    main()
+    # Print employee's TODO list progress
+    print(
+        f"Employee {EMPLOYEE_NAME} is done with tasks ({DONE_TASKS}/{TOTAL_TASKS}):")
+    for title in TASK_TITLE:
+        # Print each completed task title
+        print("\t", title)
