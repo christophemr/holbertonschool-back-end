@@ -27,13 +27,13 @@ if __name__ == "__main__":
 
     # Extract relevant information from the data
     TASK_TITLE = [task["title"] for task in data if task["completed"]]
-    TOTAL_TASKS = len(data)
-    DONE_TASKS = len(TASK_TITLE)
+    TOTAL_NUMBER_OF_TASKS = len(data)
+    NUMBER_OF_DONE_TASKS = len(TASK_TITLE)
     EMPLOYEE_NAME = data[0]["user"]["name"]
 
     # Print employee's TODO list progress
-    print(
-        f"Employee {EMPLOYEE_NAME} is done with tasks ({DONE_TASKS}/{TOTAL_TASKS}):")
+    print(f"Employee {EMPLOYEE_NAME} is done with tasks"
+          f"({NUMBER_OF_DONE_TASKS}/{TOTAL_NUMBER_OF_TASKS}):")
     for title in TASK_TITLE:
         # Print each completed task title
         print("\t", title)
